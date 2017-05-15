@@ -2,3 +2,5 @@
 logs/
 nginx/cert/
 
+redis/redis.conf
+redis/redis.password

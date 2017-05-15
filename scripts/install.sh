@@ -45,3 +45,13 @@ sudo docker build -t frontend .
 
 sudo docker run --name frontend -d --restart=always -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
+cd ../redis
+
+# random redis password
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > redis.password
+sed -e "s/PASSWORD/`cat redis.password`/" redis.conf.template > redis.conf
+
+sudo docker build -t store .
+
+sudo docker run --name store -d --restart=always -p :6379:6379 store
+
