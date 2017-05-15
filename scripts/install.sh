@@ -32,5 +32,5 @@ sudo systemctl enable docker
 cd nginx
 sudo docker build -t frontend .
 
-sudo docker run -h frontend --name frontend -d --restart=always -p :80:80 frontend
+sudo docker run --name frontend -d --restart=always -p :80:80 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
