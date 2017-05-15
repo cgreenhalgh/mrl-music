@@ -30,7 +30,18 @@ sudo systemctl enable docker
 # sudo docker run hello-world
 
 cd nginx
+
+# self-signed cert
+[ -d foo ] || mkdir cert
+openssl req \
+       -newkey rsa:2048 -nodes -keyout cert/localhost.key \
+       -out cert/localhost.csr
+openssl x509 \
+       -signkey cert/localhost.key \
+       -in cert/localhost.csr \
+       -req -days 365 -out cert/localhost.crt
+
 sudo docker build -t frontend .
 
-sudo docker run --name frontend -d --restart=always -p :80:80 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
+sudo docker run --name frontend -d --restart=always -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
