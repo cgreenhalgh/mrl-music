@@ -55,3 +55,11 @@ sudo docker build -t store .
 
 sudo docker run --name store -d --restart=always -p :6379:6379 store
 
+# firewall
+#sudo iptables -L DOCKER --line-numbers
+# interface, e.g. eth0
+#sudo iptables -I DOCKER -i enp0s3 -p tcp --dport 6379 ! -s 128.243.22.74 -j DROP
+# vagrant host IP 10.0.2.2
+#sudo iptables -I DOCKER -i enp0s3 -p tcp --dport 6379 ! -s 10.0.2.2 -j DROP
+# sudo iptables -D DOCKER 1
+
