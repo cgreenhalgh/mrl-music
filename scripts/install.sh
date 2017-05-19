@@ -40,6 +40,7 @@ openssl x509 \
        -signkey cert/localhost.key \
        -in cert/localhost.csr \
        -req -days 365 -out cert/localhost.crt
+touch cert/keys.pass
 
 sudo docker build -t frontend .
 
