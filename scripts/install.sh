@@ -42,6 +42,13 @@ openssl x509 \
        -req -days 365 -out cert/localhost.crt
 touch cert/keys.pass
 
+# cp music-mrl/music-mrl.nott.ac.uk.enckey music-mrl.nott.ac.uk.key
+# cp music-mrl/music-mrl_nott_ac_uk.crt music-mrl.nott.ac.uk.concat.crt
+# cat music-mrl/RootCertificates/QuoVadisOVIntermediateCertificate.crt >> music-mrl.nott.ac.uk.concat.crt
+# echo >> music-mrl.nott.ac.uk.concat.crt
+# cat music-mrl/RootCertificates/QuoVadisOVRootCertificate.crt  >> music-mrl.nott.ac.uk.concat.crt
+# echo XXXX > cert/keys.pass
+
 sudo docker build -t frontend .
 
 sudo docker run --name frontend -d --restart=always -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
