@@ -105,7 +105,8 @@ cd ../muzivisual
 sudo docker built -t visuals .
 
 sudo docker run \
---network=internal --name=visuals \
--d --restart=always -e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` visuals
+--network=internal --name=visuals -d --restart=always \
+-e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+visuals
 
 
