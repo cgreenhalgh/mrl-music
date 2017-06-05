@@ -29,6 +29,8 @@ sudo systemctl enable docker
 # sudo systemctl disable docker
 # sudo docker run hello-world
 
+sudo docker network create --driver bridge internal
+
 cd nginx
 
 # self-signed cert
@@ -51,7 +53,7 @@ touch cert/keys.pass
 
 sudo docker build -t frontend .
 
-sudo docker run --name frontend -d --restart=always -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
+sudo docker run --name frontend -d --restart=always --network=internal -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
 cd ../redis
 
@@ -61,7 +63,7 @@ sed -e "s/PASSWORD/`cat redis.password`/" redis.conf.template > redis.conf
 
 sudo docker build -t store .
 
-sudo docker run --name store -d --restart=always -p :6379:6379 store
+sudo docker run --name store -d --restart=always --network=internal -p :6379:6379 store
 
 # firewall
 #sudo iptables -L DOCKER --line-numbers
@@ -71,3 +73,24 @@ sudo docker run --name store -d --restart=always -p :6379:6379 store
 #sudo iptables -I DOCKER -i enp0s3 -p tcp --dport 6379 ! -s 10.0.2.2 -j DROP
 # sudo iptables -D DOCKER 1
 
+cd ../annalist
+
+sudo docker pull gklyne/annalist_site
+sudo docker pull gklyne/annalist
+
+# one time
+sudo docker run --name=annalist_site --detach gklyne/annalist_site
+#sudo docker run --interactive --tty --rm \
+#    --publish=8000:8000 --volumes-from=annalist_site \
+#    gklyne/annalist bash <<!
+sudo docker run --interactive --tty --rm \
+    --network=internal --name=annalist --volumes-from=annalist_site \
+    gklyne/annalist bash
+# one time
+annalist-manager createsitedata
+annalist-manager initialize
+# or later
+annalist-manager updatesitedata
+
+annalist-manager runserver
+!
