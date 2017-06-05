@@ -94,3 +94,18 @@ annalist-manager updatesitedata
 
 annalist-manager runserver
 !
+sudo docker run \
+--network=internal --name=annalist --volumes-from=annalist_site \
+-d --restart=always gklyne/annalist annalist-manager runserver
+
+cd ../muzivisual
+
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual
+
+sudo docker built -t visuals .
+
+sudo docker run \
+--network=internal --name=visuals \
+-d --restart=always -e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` visuals
+
+
