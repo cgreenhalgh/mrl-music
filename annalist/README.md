@@ -2,7 +2,7 @@
 
 See [Annalist installation](https://github.com/gklyne/annalist/blob/master/documents/installing-annalist.md).
 
-Run on internal network?
+See also ../scripts/install
 
 By default serves content from /annalist/ and /static/
 
@@ -14,7 +14,8 @@ proxy_set_header Host $http_host;
 annalist-manager installcollection Resource_defs
 
 cd ~/annalist_site/c/
-git clone https://github.com/gklyne/Performance_defs
+git clone https://github.com/cgreenhalgh/Performance_defs.git
+git clone https://github.com/cgreenhalgh/annalist_performance_archive.git
 
 
 (5) Log in to Annalist using an account with ADMIN or CREATE_COLLECTION permissions.
