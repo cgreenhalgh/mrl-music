@@ -1,5 +1,12 @@
 # archive
 
+For now you can process the log offline.
+
+Check out and build the music-archive archive-app and copy the 
+contents of archive-app/dist to ../nginx/html/1/archive/
+
+See also...
+
 ```
 git clone https://github.com/cgreenhalgh/music-archive
 sudo docker build -t archive .

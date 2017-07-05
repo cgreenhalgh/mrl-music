@@ -53,7 +53,9 @@ touch cert/keys.pass
 
 sudo docker build -t frontend .
 
-sudo docker run --name frontend -d --restart=always --network=internal -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
+sudo docker run --name frontend -d --restart=always --network=internal \
+  -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html \
+  -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
 cd ../redis
 
