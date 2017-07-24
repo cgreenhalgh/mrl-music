@@ -10,6 +10,9 @@ Note: for nginx:
 ```
 proxy_set_header Host $http_host;
 ```
+```
+sudo docker exec -it annalist bash
+```
 
 annalist-manager installcollection Resource_defs
 

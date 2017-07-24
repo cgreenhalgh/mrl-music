@@ -31,6 +31,31 @@ sudo systemctl enable docker
 
 sudo docker network create --driver bridge internal
 
+
+cd ../muzivisual1
+
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual; git checkout v1
+
+sudo docker built -t visual1 .
+
+sudo docker run \
+--network=internal --name=visual1 -d --restart=always \
+-e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+visual1
+
+cd ../muzivisual2
+
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual
+
+sudo docker built -t visual2 .
+
+sudo docker run \
+--network=internal --name=visual2 -d --restart=always \
+-e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+visual2
+
+
+
 cd nginx
 
 # self-signed cert
@@ -54,7 +79,7 @@ touch cert/keys.pass
 sudo docker build -t frontend .
 
 sudo docker run --name frontend -d --restart=always --network=internal \
-  -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html \
+  -p :80:80 -p :443:443 -v `pwd`/../html:/usr/share/nginx/html \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
 cd ../redis
@@ -65,7 +90,8 @@ sed -e "s/PASSWORD/`cat redis.password`/" redis.conf.template > redis.conf
 
 sudo docker build -t store .
 
-sudo docker run --name store -d --restart=always --network=internal -p :6379:6379 store
+sudo docker run --name store -d --restart=always --network=internal \
+  -p :6379:6379 store
 
 # firewall
 #sudo iptables -L DOCKER --line-numbers
