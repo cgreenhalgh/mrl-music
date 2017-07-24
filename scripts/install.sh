@@ -54,7 +54,7 @@ touch cert/keys.pass
 sudo docker build -t frontend .
 
 sudo docker run --name frontend -d --restart=always --network=internal \
-  -p :80:80 -p :443:443 -v `pwd`/html:/usr/share/nginx/html \
+  -p :80:80 -p :443:443 -v `pwd`/../html:/usr/share/nginx/html \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
 
 cd ../redis
@@ -65,7 +65,8 @@ sed -e "s/PASSWORD/`cat redis.password`/" redis.conf.template > redis.conf
 
 sudo docker build -t store .
 
-sudo docker run --name store -d --restart=always --network=internal -p :6379:6379 store
+sudo docker run --name store -d --restart=always --network=internal \
+  -p :6379:6379 store
 
 # firewall
 #sudo iptables -L DOCKER --line-numbers
