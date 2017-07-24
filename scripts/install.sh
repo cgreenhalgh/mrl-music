@@ -31,6 +31,31 @@ sudo systemctl enable docker
 
 sudo docker network create --driver bridge internal
 
+
+cd ../muzivisual1
+
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual; git checkout v1
+
+sudo docker built -t visual1 .
+
+sudo docker run \
+--network=internal --name=visual1 -d --restart=always \
+-e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+visual1
+
+cd ../muzivisual2
+
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual
+
+sudo docker built -t visual2 .
+
+sudo docker run \
+--network=internal --name=visual2 -d --restart=always \
+-e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+visual2
+
+
+
 cd nginx
 
 # self-signed cert
