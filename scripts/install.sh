@@ -51,6 +51,7 @@ sudo docker built -t visual2 .
 
 sudo docker run \
 --network=internal --name=visual2 -d --restart=always \
+-v `pwd`/../logs/muzivisual2:/srv/muzivisual/app/logs \
 -e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
 visual2
 
