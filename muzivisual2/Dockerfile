@@ -9,6 +9,8 @@ RUN cd /srv/muzivisual && npm install --production
 
 ADD muzivisual/app /srv/muzivisual/app
 VOLUME /srv/muzivisual/app/maps
+RUN mkdir /srv/muzivisual/app/logs
+VOLUME /srv/muzivisual/app/logs
 
 ENV REDIS_HOST=localhost
 ENV REDIS_PASSWORD=
