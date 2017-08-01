@@ -26,3 +26,9 @@ del performance:be418821-436d-41c2-880c-058dffb57d91
 del performance:13a7fa70-ae91-4541-9526-fd3b332b585d
 ```
 
+## Dump performances (history)
+```
+sudo docker exec visual2 redis-dump -a `cat ../redis/redis.password` \
+ -h store --json 'performance:*' > performances.json
+```
+

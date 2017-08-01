@@ -14,5 +14,6 @@ ENV REDIS_HOST=localhost
 ENV REDIS_PASSWORD=
 
 WORKDIR /srv/muzivisual
+RUN npm install redis-dump -g
 
 CMD [ "node", "app/server.js" ] 
