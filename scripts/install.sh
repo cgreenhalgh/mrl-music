@@ -81,7 +81,9 @@ sudo docker build -t frontend .
 
 sudo docker run --name frontend -d --restart=always --network=internal \
   -p :80:80 -p :443:443 -v `pwd`/../html:/usr/share/nginx/html \
-  -v `pwd`/../logs/nginx:/var/log/nginx/log frontend
+  -v `pwd`/conf.d:/etc/nginx/conf.d \
+  -v `pwd`/../logs/nginx:/var/log/nginx/log frontend 
+
 
 cd ../redis
 
@@ -138,4 +140,14 @@ sudo docker run \
 -e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
 visuals
 
+cd ../archive
 
+[-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
+
+cd music-archive/logproc
+sudo docker build -t logproc .
+cd ../..
+sudo docker run --name logproc -d --restart=always \
+  --network internal \
+  -v `pwd`/../html/1/archive/assets/data:/srv/archive/output \
+  -v `pwd`/../logs/logproc:/srv/archive/logs logproc

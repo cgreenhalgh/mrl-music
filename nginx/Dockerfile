@@ -8,4 +8,5 @@ ADD cert/*.crt cert/*.key cert/*.enckey /etc/nginx/
 ADD cert/keys.pass /etc/nginx/keys.pass
 VOLUME /usr/share/nginx/html
 VOLUME /var/log/nginx/log
+VOLUME /etc/nginx/conf.d
 EXPOSE 443
