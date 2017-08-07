@@ -144,7 +144,11 @@ cd ../archive
 
 [-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
 
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > logproc.password
+sed -e "s/PASSWORD/`cat logproc.password`/" music-archive/logproc/etc/server-config.yml.template > music-archive/logproc/etc/server-config.yml
+
 cd music-archive/logproc
+
 sudo docker build -t logproc .
 cd ../..
 sudo docker run --name logproc -d --restart=always \
