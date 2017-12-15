@@ -86,6 +86,22 @@ sudo docker run --name logproc -d --restart=always \
   -v `pwd`/../html/1/archive/assets/data:/srv/archive/output \
   -v `pwd`/../logs/logproc:/srv/archive/logs logproc
 
+# music-hub - mysql
+cd ../music-hub
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > hubdb.password
+sudo docker run --name hubdb -e MYSQL_ROOT_PASSWORD=`cat hubdb.password` --network=internal -d --restart=always mysql:5.7
+
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > hubadmin.password
+sed -e "s/HUBDB_PASSWORD/`cat hubdb.password`/;s/HUBADMIN_PASSWORD/`cat hubadmin.password`/" music-hub/createdb.sql.template > music-hub/createdb.sql
+
+# init db
+cat music-hub/createdb.sql | sudo docker run -i --rm --network=internal mysql:5.7 sh -c "exec mysql -hhubdb -P3306 -uroot -p`cat hubdb.password`"
+
+cd music-hub
+sudo docker build -t music-hub -f Dockerfile.musichub .
+cd ..
+
+sudo docker run --name=musichub -d -p 8000:8000 --network=internal -e HUBADMIN_PASSWORD=`cat hubadmin.password` --restart=always music-hub 
 
 cd ../nginx
 

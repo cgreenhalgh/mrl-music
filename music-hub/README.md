@@ -4,7 +4,9 @@
 git clone https://github.com/cgreenhalgh/music-hub.git
 ```
 
-See[music-hub/README.md](music-hub/README.md) for now.
+See[music-hub/README.md](music-hub/README.md).
+
+Requires mysql server (hubdb by default)
 
 E.g.
 ```
