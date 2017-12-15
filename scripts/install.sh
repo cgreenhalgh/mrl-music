@@ -74,10 +74,20 @@ cd ../archive
 
 [-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
 
+cd music-archive/archive-app
+sudo docker build -t archive-app .
+sudo docker run --rm archive-app cat /root/work/archive.tgz| cat - > ../../archive.tgz
+#sudo docker run --rm archive-app cat /root/work/package-lock.json |  cat - > package-lock.json
+cd ../..
+
+(cd ../html/1/archive; tar zxf ../../../archive/archive.tgz)
+
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > logproc.password
 sed -e "s/PASSWORD/`cat logproc.password`/" music-archive/logproc/etc/server-config.yml.template > music-archive/logproc/etc/server-config.yml
 
 cd music-archive/logproc
+
+# NB archive must be installed in html/1/archive/ before logproc will start properly
 
 sudo docker build -t logproc .
 cd ../..
