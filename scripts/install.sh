@@ -31,12 +31,23 @@ sudo systemctl enable docker
 
 sudo docker network create --driver bridge internal
 
+cd redis
+
+# random redis password
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > redis.password
+sed -e "s/PASSWORD/`cat redis.password`/" redis.conf.template > redis.conf
+
+sudo docker build -t store .
+
+sudo docker run --name store -d --restart=always --network=internal \
+  -p :6379:6379 store
+
 
 cd ../muzivisual1
 
 [-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual; git checkout v1
 
-sudo docker built -t visual1 .
+sudo docker build -t visual1 .
 
 sudo docker run \
 --network=internal --name=visual1 -d --restart=always \
@@ -47,7 +58,10 @@ cd ../muzivisual2
 
 [-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual
 
-sudo docker built -t visual2 .
+# fix base href in web app
+sed -i -e 'sX<base href="/">X<base href="/2/muzivisual/">X' muzivisual/app/public/index.html
+
+sudo docker build -t visual2 .
 
 sudo docker run \
 --network=internal --name=visual2 -d --restart=always \
@@ -56,11 +70,27 @@ sudo docker run \
 visual2
 
 
+cd ../archive
 
-cd nginx
+[-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
+
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > logproc.password
+sed -e "s/PASSWORD/`cat logproc.password`/" music-archive/logproc/etc/server-config.yml.template > music-archive/logproc/etc/server-config.yml
+
+cd music-archive/logproc
+
+sudo docker build -t logproc .
+cd ../..
+sudo docker run --name logproc -d --restart=always \
+  --network internal \
+  -v `pwd`/../html/1/archive/assets/data:/srv/archive/output \
+  -v `pwd`/../logs/logproc:/srv/archive/logs logproc
+
+
+cd ../nginx
 
 # self-signed cert
-[ -d foo ] || mkdir cert
+[ -d cert ] || mkdir cert
 openssl req \
        -newkey rsa:2048 -nodes -keyout cert/localhost.key \
        -out cert/localhost.csr
@@ -84,18 +114,6 @@ sudo docker run --name frontend -d --restart=always --network=internal \
   -v `pwd`/conf.d:/etc/nginx/conf.d \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend 
 
-
-cd ../redis
-
-# random redis password
-< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > redis.password
-sed -e "s/PASSWORD/`cat redis.password`/" redis.conf.template > redis.conf
-
-sudo docker build -t store .
-
-sudo docker run --name store -d --restart=always --network=internal \
-  -p :6379:6379 store
-
 # firewall
 #sudo iptables -L DOCKER --line-numbers
 # interface, e.g. eth0
@@ -104,54 +122,3 @@ sudo docker run --name store -d --restart=always --network=internal \
 #sudo iptables -I DOCKER -i enp0s3 -p tcp --dport 6379 ! -s 10.0.2.2 -j DROP
 # sudo iptables -D DOCKER 1
 
-cd ../annalist
-
-sudo docker pull gklyne/annalist_site
-sudo docker pull gklyne/annalist
-
-# one time
-sudo docker run --name=annalist_site --detach gklyne/annalist_site
-#sudo docker run --interactive --tty --rm \
-#    --publish=8000:8000 --volumes-from=annalist_site \
-#    gklyne/annalist bash <<!
-sudo docker run --interactive --tty --rm \
-    --network=internal --name=annalist --volumes-from=annalist_site \
-    gklyne/annalist bash
-# one time
-annalist-manager createsitedata
-annalist-manager initialize
-# or later
-annalist-manager updatesitedata
-
-annalist-manager runserver
-!
-sudo docker run \
---network=internal --name=annalist --volumes-from=annalist_site \
--d --restart=always gklyne/annalist annalist-manager runserver
-
-cd ../muzivisual
-
-[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual
-
-sudo docker built -t visuals .
-
-sudo docker run \
---network=internal --name=visuals -d --restart=always \
--e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
-visuals
-
-cd ../archive
-
-[-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
-
-< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > logproc.password
-sed -e "s/PASSWORD/`cat logproc.password`/" music-archive/logproc/etc/server-config.yml.template > music-archive/logproc/etc/server-config.yml
-
-cd music-archive/logproc
-
-sudo docker build -t logproc .
-cd ../..
-sudo docker run --name logproc -d --restart=always \
-  --network internal \
-  -v `pwd`/../html/1/archive/assets/data:/srv/archive/output \
-  -v `pwd`/../logs/logproc:/srv/archive/logs logproc
