@@ -66,6 +66,7 @@ sudo docker build -t visual2 .
 sudo docker run \
 --network=internal --name=visual2 -d --restart=always \
 -v `pwd`/../logs/muzivisual2:/srv/muzivisual/app/logs \
+-v `pwd`/../data/muzivisual2:/srv/muzivisual/app/data \
 -e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
 visual2
 
@@ -113,7 +114,12 @@ cd music-hub
 sudo docker build -t music-hub -f Dockerfile.musichub .
 cd ..
 
-sudo docker run --name=musichub -d -p 8000:8000 --network=internal -e MUSICHUB_PASSWORD=`cat musichub.password` -e REDIS_PASSWORD=`cat ../redis/redis.password` -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` --restart=always music-hub
+sudo docker run --name=musichub -d -p 8000:8000 \
+ --network=internal -e MUSICHUB_PASSWORD=`cat musichub.password` \
+ -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+ -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` \
+ -v `pwd`/../data/muzivisual2:/root/work/mounts/climbapp/muzivisual2 \
+ --restart=always music-hub
 echo "login as root@musichub password `cat hubadmin.password`"
 
 cd ../nginx
