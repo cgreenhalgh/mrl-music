@@ -17,7 +17,12 @@ cd ..
 
 dev/test
 ```
-sudo docker run -it --rm -p 8000:8000 -p 4200:4200 -p 9876:9876 --network=internal -e MUSICHUB_PASSWORD=`cat musichub.password` -e REDIS_PASSWORD=`cat ../redis/redis.password` -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` music-hub /bin/bash
+sudo docker run -it --rm -p 8000:8000 -p 4200:4200 -p 9876:9876 \
+ --network=internal -e MUSICHUB_PASSWORD=`cat musichub.password` \
+ -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+ -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` \
+ -v `pwd`/../data/muzivisual2:/root/work/mounts/climbapp/muzivisual2 \
+ music-hub /bin/bash
 ```
 ```
 cd server/
