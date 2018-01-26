@@ -99,6 +99,9 @@ sudo docker run --name logproc -d --restart=always \
 
 # music-hub - mysql
 cd ../music-hub
+
+[-d music-hub] || git clone https://github.com/cgreenhalgh/music-hub
+
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > hubdb.password
 sudo docker run --name hubdb -e MYSQL_ROOT_PASSWORD=`cat hubdb.password` --network=internal -d --restart=always mysql:5.7
 
@@ -119,6 +122,7 @@ sudo docker run --name=musichub -d -p 8000:8000 \
  -e REDIS_PASSWORD=`cat ../redis/redis.password` \
  -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` \
  -v `pwd`/../data/muzivisual2:/root/work/mounts/climbapp/muzivisual2 \
+ -v `pwd`/../html/1/archive/assets/data:/root/work/mounts/climbapp/archive \
  --restart=always music-hub
 echo "login as root@musichub password `cat hubadmin.password`"
 
