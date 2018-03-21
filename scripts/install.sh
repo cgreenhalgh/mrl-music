@@ -83,6 +83,16 @@ cd ../..
 
 (cd ../html/1/archive; tar zxf ../../../archive/archive.tgz)
 
+# muzivisual for use with archive
+mkdir ../html/1/archive-muzivisual
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual && git checkout linkapps
+sed -i -e 'sX<base href="/">X<base href="/1/archive-muzivisual/">X' muzivisual/app/public/index.html
+#sudo docker build -f Dockerfile.muzivisual -t archive-muzivisual .
+#sudo docker run --rm archive-muzivisual
+
+(cd muzivisual/app/public; tar zcf - *) | (cd ../html/1/archive-muzivisual; tar zxf -)
+
+
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > logproc.password
 sed -e "s/PASSWORD/`cat logproc.password`/" music-archive/logproc/etc/server-config.yml.template > music-archive/logproc/etc/server-config.yml
 
