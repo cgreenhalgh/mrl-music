@@ -18,8 +18,11 @@ sudo docker run --name logproc -d --network internal \
 ```
 or maybe
 ```
-sudo docker exec -it archive bash
+sudo docker run -it -v `pwd`/../test/data:/srv/archive/output --rm logproc bash
 
-node lib/processlogs.js test/data/example_entity_list.json test/data/20170608T112725862Z-default.log 'test/data/Climb!June8.csv'
+node lib/processlogs.js output/example_entity_list.json \
+  output/20170608T112725862Z-default.log 'output/Climb!London.csv' \
+  output/recordingsJune8.yml output/narrativesLondon.csv \
+  output/mkGameEngine.xlsx output/performances.json
 ```
 
