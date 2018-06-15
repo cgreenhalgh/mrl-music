@@ -133,6 +133,7 @@ sudo docker run --name=musichub -d -p 8000:8000 \
  -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` \
  -v `pwd`/../data/muzivisual2:/root/work/mounts/climbapp/muzivisual2 \
  -v `pwd`/../html/1/archive/assets/data:/root/work/mounts/climbapp/archive \
+ -v `pwd`/../html/1/recordings:/root/work/mounts/uploads \
  --restart=always music-hub
 echo "login as root@musichub password `cat hubadmin.password`"
 

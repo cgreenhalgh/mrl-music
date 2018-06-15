@@ -22,7 +22,9 @@ sudo docker run -it --rm -p 8000:8000 -p 4200:4200 -p 9876:9876 \
  -e REDIS_PASSWORD=`cat ../redis/redis.password` \
  -e LOGPROC_PASSWORD=`cat ../archive/logproc.password` \
  -v `pwd`/../data/muzivisual2:/root/work/mounts/climbapp/muzivisual2 \
- music-hub /bin/bash
+ -v `pwd`/../html/1/archive/assets/data:/root/work/mounts/climbapp/archive \
+ -v `pwd`/../html/1/recordings:/root/work/mounts/uploads \
+ --name musichub music-hub /bin/bash
 ```
 ```
 cd server/
