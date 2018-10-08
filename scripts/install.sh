@@ -76,7 +76,6 @@ cd ../archive
 [-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
 
 cd music-archive/archive-app
-git checkout playlist
 
 sudo docker build -t archive-app .
 sudo docker run --rm archive-app cat /root/work/archive.tgz| cat - > ../../archive.tgz
