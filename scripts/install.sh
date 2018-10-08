@@ -76,6 +76,8 @@ cd ../archive
 [-d music-archive] || git clone https://github.com/cgreenhalgh/music-archive
 
 cd music-archive/archive-app
+git checkout playlist
+
 sudo docker build -t archive-app .
 sudo docker run --rm archive-app cat /root/work/archive.tgz| cat - > ../../archive.tgz
 #sudo docker run --rm archive-app cat /root/work/package-lock.json |  cat - > package-lock.json
@@ -85,8 +87,8 @@ cd ../..
 
 # muzivisual for use with archive
 mkdir ../html/1/archive-muzivisual
-[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual && git checkout linkapps
-sed -i -e 'sX<base href="/">X<base href="/1/archive-muzivisual/">X' muzivisual/app/public/index.html
+[-d muzivisual] || git clone https://github.com/cgreenhalgh/muzivisual && (cd muzivisual; git checkout linkapps)
+#sed -i -e 'sX<base href="/">X<base href="/1/archive-muzivisual/">X' muzivisual/app/public/index.html
 #sudo docker build -f Dockerfile.muzivisual -t archive-muzivisual .
 #sudo docker run --rm archive-muzivisual
 
