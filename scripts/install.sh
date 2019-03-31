@@ -147,14 +147,15 @@ mkdir -p html/2
 # audience-server
 cd losing-her-voice
 sudo docker build -t audience-server --network=internal audience-server
+cd ..
 
+mkdir -p logs/audience-server
 sudo docker run -d --name=audience-server --restart=always \
   --network=internal -p :8081:8081 \
-  -v `pwd`/audience-server/data:/root/work/data/ \
-  -e REDIS_HOST=store -e REDIS_PASSWORD=`cat ../redis/redis.password` \
+  -v `pwd`/losing-her-voice/audience-server/data:/root/work/data/ \
+  -v `pwd`/logs/audience-server:/root/work/logs/ \
+  -e REDIS_HOST=store -e REDIS_PASSWORD=`cat redis/redis.password` \
   audience-server
-
-cd ..
 
 cd ../nginx
 
