@@ -149,7 +149,7 @@ cd losing-her-voice
 sudo docker build -t audience-server --network=internal audience-server
 cd ..
 
-mkdir -p logs/audience-server
+sudo mkdir -p logs/audience-server
 sudo docker run -d --name=audience-server --restart=always \
   --network=internal -p :8081:8081 \
   -v `pwd`/losing-her-voice/audience-server/data:/root/work/data/ \
