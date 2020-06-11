@@ -157,7 +157,33 @@ sudo docker run -d --name=audience-server --restart=always \
   -e REDIS_HOST=store -e REDIS_PASSWORD=`cat redis/redis.password` \
   audience-server
 
-cd ../nginx
+# general logging
+cd ../logging
+[-d http-logging-service] || \
+  git clone https://github.com/cgreenhalgh/http-logging-service
+
+cd http-logging-service
+sudo docker build -t logging-server --network=internal  server
+cd ..
+
+# juan...
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > strap.password
+mkdir -p conf
+sed -e "s/STRAP_PASSWORD/`cat strap.password`/;" strap.json.template > conf/strap.json
+mkdir -p ../logs/loglevel/strap
+
+cd ..
+
+# start...
+sudo docker run -d -p 8080:8080 --name=logging-server \
+ --restart=always \
+ -v `pwd`/logging/conf:/go/src/app/conf \
+ -v `pwd`/logs/loglevel:/go/src/app/logs \
+ --network=internal \
+ logging-server
+
+
+cd nginx
 
 # self-signed cert
 [ -d cert ] || mkdir cert
