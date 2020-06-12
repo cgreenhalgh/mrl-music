@@ -169,8 +169,9 @@ cd ..
 # juan...
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > strap.password
 mkdir -p conf
-sed -e "s/STRAP_PASSWORD/`cat strap.password`/;" strap.json.template > conf/strap.json
-mkdir -p ../logs/loglevel/strap
+sed -e "s/STRAP_PASSWORD/`cat strap.password`/;" \
+  strap.json.template > conf/strap.json
+sudo mkdir -p ../logs/loglevel/strap
 
 cd ..
 
