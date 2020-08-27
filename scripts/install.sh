@@ -179,6 +179,12 @@ sed -e "s/STRAP_PASSWORD/`cat themoment.password`/;" \
   strap.json.template > conf/themoment.json
 sudo mkdir -p ../logs/loglevel/themoment
 
+# laurence
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > laurence.password
+sed -e "s/STRAP_PASSWORD/`cat laurence.password`/;" \
+  strap.json.template > conf/laurence.json
+sudo mkdir -p ../logs/loglevel/themoment
+
 cd ..
 
 # start...
