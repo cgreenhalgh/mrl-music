@@ -242,12 +242,12 @@ sudo docker run --name frontend -d --restart=always --network=internal \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend 
 
 # remove old certs
-rm -Rf /etc/letsencrypt/live/soundpostcards.sonicfutures.org && \
-  rm -Rf /etc/letsencrypt/archive/soundpostcards.sonicfutures.org && \
-  rm -Rf /etc/letsencrypt/renewal/soundpostcards.sonicfutures.org.conf
+rm -Rf certbot/conf/live/soundpostcards.sonicfutures.org && \
+  rm -Rf certbot/conf/archive/soundpostcards.sonicfutures.org && \
+  rm -Rf certbot/conf/renewal/soundpostcards.sonicfutures.org.conf
 
 # try certbot 1-off
-mkdir ../logs/certbot
+sudo mkdir ../logs/certbot
 sudo docker run --name certbot --rm --network=internal \
    -v `pwd`/certbot/conf:/etc/letsencrypt \
    -v `pwd`/certbot/www:/var/www/certbot \
@@ -264,6 +264,8 @@ sudo docker run --name certbot --rm --network=internal \
 # restart nginx
 sudo crontab -e
 # add
+0   2  *   *   *     docker run --rm --network=internal -v /srv/mrl/mrl-music/nginx/certbot/conf:/etc/letsencrypt -v /srv/mrl/mrl-music/nginx/certbot/www:/var/www/certbot -v /srv/mrl/mrl-music/logs/certbot:/var/log/letsencrypt certbot/certbot renew
+# OR
 0   2  *   *   *     docker run --rm --network=internal -v /vagrant/nginx/certbot/conf:/etc/letsencrypt -v /vagrant/nginx/certbot/www:/var/www/certbot -v /vagrant/logs/certbot:/var/log/letsencrypt certbot/certbot renew
 0   3  *   *   *     docker kill -s HUP frontend
 # check cron
