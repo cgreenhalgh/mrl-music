@@ -247,9 +247,11 @@ rm -Rf /etc/letsencrypt/live/soundpostcards.sonicfutures.org && \
   rm -Rf /etc/letsencrypt/renewal/soundpostcards.sonicfutures.org.conf
 
 # try certbot 1-off
+mkdir ../logs/certbot
 sudo docker run --name certbot --rm --network=internal \
    -v `pwd`/certbot/conf:/etc/letsencrypt \
    -v `pwd`/certbot/www:/var/www/certbot \
+   -v `pwd`/../logs/certbot:/var/log/letsencrypt \
    certbot/certbot certonly --webroot -w /var/www/certbot \
      --email chris.greenhalgh@nottingham.ac.uk \
      -d soundpostcards.sonicfutures.org \
@@ -260,7 +262,12 @@ sudo docker run --name certbot --rm --network=internal \
 
 # renew ... renew
 # restart nginx
-
+sudo crontab -e
+# add
+0   2  *   *   *     docker run --rm --network=internal -v /vagrant/nginx/certbot/conf:/etc/letsencrypt -v /vagrant/nginx/certbot/www:/var/www/certbot -v /vagrant/logs/certbot:/var/log/letsencrypt certbot/certbot renew
+0   3  *   *   *     docker kill -s HUP frontend
+# check cron
+sudo systemctl | grep cron
 
 # firewall
 #sudo iptables -L DOCKER --line-numbers
