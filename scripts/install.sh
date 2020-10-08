@@ -218,10 +218,49 @@ touch cert/keys.pass
 
 sudo docker build -t frontend .
 
+# ready for certbot - see [this](https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71)
+# see also [script](https://raw.githubusercontent.com/wmnnd/nginx-certbot/master/init-letsencrypt.sh)
+# shared folders (nginx <-> certbot)
+mkdir -p certbot/conf certbot/www
+curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf > certbot/conf/options-ssl-nginx.conf
+curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem > certbot/conf/ssl-dhparams.pem
+domains = (soundpostcards.sonicfutures.org)
+# dummy cert
+mkdir -p certbot/conf/live/soundpostcards.sonicfutures.org
+openssl req -x509 -nodes -newkey rsa:1024 -days 1\
+    -keyout 'certbot/conf/live/soundpostcards.sonicfutures.org/privkey.pem' \
+    -out 'certbot/conf/live/soundpostcards.sonicfutures.org/fullchain.pem' \
+    -subj '/CN=localhost'
+
+# the real frontend!!
+
 sudo docker run --name frontend -d --restart=always --network=internal \
   -p :80:80 -p :443:443 -v `pwd`/../html:/usr/share/nginx/html \
   -v `pwd`/conf.d:/etc/nginx/conf.d \
+  -v `pwd`/certbot/conf:/etc/letsencrypt \
+  -v `pwd`/certbot/www:/var/www/certbot \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend 
+
+# remove old certs
+rm -Rf /etc/letsencrypt/live/soundpostcards.sonicfutures.org && \
+  rm -Rf /etc/letsencrypt/archive/soundpostcards.sonicfutures.org && \
+  rm -Rf /etc/letsencrypt/renewal/soundpostcards.sonicfutures.org.conf
+
+# try certbot 1-off
+sudo docker run --name certbot --rm --network=internal \
+   -v `pwd`/certbot/conf:/etc/letsencrypt \
+   -v `pwd`/certbot/www:/var/www/certbot \
+   certbot/certbot certonly --webroot -w /var/www/certbot \
+     --email chris.greenhalgh@nottingham.ac.uk \
+     -d soundpostcards.sonicfutures.org \
+    --rsa-key-size 4096 \
+    --agree-tos \
+    --force-renewal
+#    --dry-run
+
+# renew ... renew
+# restart nginx
+
 
 # firewall
 #sudo iptables -L DOCKER --line-numbers
