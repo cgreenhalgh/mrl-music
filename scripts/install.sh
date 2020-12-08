@@ -204,17 +204,17 @@ openssl req \
        -newkey rsa:2048 -nodes -keyout cert/localhost.key \
        -out cert/localhost.csr
 openssl x509 \
-       -signkey cert/localhost.key \
+
        -in cert/localhost.csr \
        -req -days 365 -out cert/localhost.crt
 touch cert/keys.pass
 
 # cp music-mrl/music-mrl.nott.ac.uk.enckey music-mrl.nott.ac.uk.key
 # cp music-mrl/music-mrl_nott_ac_uk.crt music-mrl.nott.ac.uk.concat.crt
-# cat music-mrl/RootCertificates/QuoVadisOVIntermediateCertificate.crt >> music-mrl.nott.ac.uk.concat.crt
+# cat music-mrl/QuoVadisEVIntermediateCertificate.crt >> music-mrl.nott.ac.uk.concat.crt
 # echo >> music-mrl.nott.ac.uk.concat.crt
-# cat music-mrl/RootCertificates/QuoVadisOVRootCertificate.crt  >> music-mrl.nott.ac.uk.concat.crt
-# echo XXXX > cert/keys.pass
+# cat music-mrl/QuoVadisEVRootCertificate.crt  >> music-mrl.nott.ac.uk.concat.crt
+# echo XXXX > music-mrl.nott.ac.uk.pass
 
 sudo docker build -t frontend .
 
@@ -237,6 +237,7 @@ openssl req -x509 -nodes -newkey rsa:1024 -days 1\
 sudo docker run --name frontend -d --restart=always --network=internal \
   -p :80:80 -p :443:443 -v `pwd`/../html:/usr/share/nginx/html \
   -v `pwd`/conf.d:/etc/nginx/conf.d \
+  -v `pwd`/cert:/etc/nginx/cert \
   -v `pwd`/certbot/conf:/etc/letsencrypt \
   -v `pwd`/certbot/www:/var/www/certbot \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend 
@@ -264,10 +265,10 @@ sudo docker run --name certbot --rm --network=internal \
 # restart nginx
 sudo crontab -e
 # add
-0   2  *   *   *     docker run --rm --network=internal -v /srv/mrl/mrl-music/nginx/certbot/conf:/etc/letsencrypt -v /srv/mrl/mrl-music/nginx/certbot/www:/var/www/certbot -v /srv/mrl/mrl-music/logs/certbot:/var/log/letsencrypt certbot/certbot renew
+0   2  *   *   *     docker run --rm --network=internal -v /srv/mrl/mrl-music/nginx/certbot/conf:/etc/letsencrypt -v /srv/mrl/mrl-music/nginx/certbot/www:/var/www/certbot -v /srv/mrl/mrl-music/logs/certbot:/var/log/letsencrypt certbot/certbot renew > /dev/null
 # OR
-0   2  *   *   *     docker run --rm --network=internal -v /vagrant/nginx/certbot/conf:/etc/letsencrypt -v /vagrant/nginx/certbot/www:/var/www/certbot -v /vagrant/logs/certbot:/var/log/letsencrypt certbot/certbot renew
-0   3  *   *   *     docker kill -s HUP frontend
+0   2  *   *   *     docker run --rm --network=internal -v /vagrant/nginx/certbot/conf:/etc/letsencrypt -v /vagrant/nginx/certbot/www:/var/www/certbot -v /vagrant/logs/certbot:/var/log/letsencrypt certbot/certbot renew > /dev/null
+0   3  *   *   *     docker kill -s HUP frontend > /dev/null
 # check cron
 sudo systemctl | grep cron
 
