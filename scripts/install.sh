@@ -24,8 +24,9 @@ sudo add-apt-repository \
    stable"
 sudo apt-get update
 
-sudo apt-get install docker-ce docker-ce-cli containerd.io
-#sudo apt-get install -y docker-ce=17.03.1~ce-0~ubuntu-xenial
+# latest not working on mrl-music
+#sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get install -y docker-ce=17.03.1~ce-0~ubuntu-xenial
 sudo systemctl enable docker
 # sudo systemctl disable docker
 # sudo docker run hello-world
@@ -303,8 +304,8 @@ cd music-class-chat
 < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > mongo.password
 
 
-sudo docker run -it --rm --network internal mongo \
-    mongo --host mongodb \
+sudo docker run -it --rm --network=internal \
+    mongo:4.4.4-bionic mongo --host mongodb \
         -u mongoadmin \
         -p `cat ../mongoadmin.password` \
         --authenticationDatabase admin 
@@ -312,14 +313,18 @@ sudo docker run -it --rm --network internal mongo \
 # db.createUser({user:"music-class-chat-server",pwd:"...",roles:[{role:"readWrite",db:"music-class-chat"}]})
 
 # test
-sudo docker run -it --rm --network internal mongo \
+sudo docker run -it --rm --network=internal mongo:4.4.4-bionic \
     mongo --host mongodb \
         -u music-class-chat-server \
         -p `cat mongo.password` \
         --authenticationDatabase admin 
 # see music-class-chat for any initial setup
 
-
+# this needs a newer docker...
+# consider 
+# sudo docker save -o music-class-chat music-class-chat:latest
+# sftp ...
+# sudo docker load -i music-class-chat.zip
 sudo docker build --network=internal \
   --build-arg BASEPATH=/3/music-class-chat \
   -t music-class-chat .
@@ -327,6 +332,8 @@ sudo docker build --network=internal \
 #default port 3000
 sudo docker volume create music-class-chat-uploads
 sudo docker volume create music-class-chat-sessions
+
+# bootstrap mongodb - site, group, adminsession - see music-class-chat/docs/test.md
 
 sudo docker run --network=internal -d \
   --name=music-class-chat --restart=always \
