@@ -24,7 +24,8 @@ sudo add-apt-repository \
    stable"
 sudo apt-get update
 
-sudo apt-get install -y docker-ce=17.03.1~ce-0~ubuntu-xenial
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+#sudo apt-get install -y docker-ce=17.03.1~ce-0~ubuntu-xenial
 sudo systemctl enable docker
 # sudo systemctl disable docker
 # sudo docker run hello-world
@@ -204,7 +205,7 @@ openssl req \
        -newkey rsa:2048 -nodes -keyout cert/localhost.key \
        -out cert/localhost.csr
 openssl x509 \
-
+	-signkey cert/localhost.key \
        -in cert/localhost.csr \
        -req -days 365 -out cert/localhost.crt
 touch cert/keys.pass
@@ -261,6 +262,8 @@ sudo docker run --name certbot --rm --network=internal \
     --force-renewal
 #    --dry-run
 
+cd ..
+
 # renew ... renew
 # restart nginx
 sudo crontab -e
@@ -279,4 +282,57 @@ sudo systemctl | grep cron
 # vagrant host IP 10.0.2.2
 #sudo iptables -I DOCKER -i enp0s3 -p tcp --dport 6379 ! -s 10.0.2.2 -j DROP
 # sudo iptables -D DOCKER 1
+
+# mongo - for music-class-chat
+sudo docker volume create mongodb
+
+# init mongo w auth
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > mongoadmin.password
+
+sudo docker run --name mongodb -d --restart=always --network=internal \
+    -e MONGO_INITDB_ROOT_USERNAME=mongoadmin \
+    -e MONGO_INITDB_ROOT_PASSWORD=`cat mongoadmin.password` \
+    -v mongodb:/data/db \
+  mongo:4.4.4-bionic  --wiredTigerCacheSizeGB 0.5
+
+# music-class-chat
+
+[-d music-class-chat] || git clone https://github.com/cgreenhalgh/music-class-chat.git
+
+cd music-class-chat
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32} > mongo.password
+
+
+sudo docker run -it --rm --network internal mongo \
+    mongo --host mongodb \
+        -u mongoadmin \
+        -p `cat ../mongoadmin.password` \
+        --authenticationDatabase admin 
+        admin
+# db.createUser({user:"music-class-chat-server",pwd:"...",roles:[{role:"readWrite",db:"music-class-chat"}]})
+
+# test
+sudo docker run -it --rm --network internal mongo \
+    mongo --host mongodb \
+        -u music-class-chat-server \
+        -p `cat mongo.password` \
+        --authenticationDatabase admin 
+# see music-class-chat for any initial setup
+
+
+sudo docker build --network=internal \
+  --build-arg BASEPATH=/3/music-class-chat \
+  -t music-class-chat .
+
+#default port 3000
+sudo docker volume create music-class-chat-uploads
+sudo docker volume create music-class-chat-sessions
+
+sudo docker run --network=internal -d \
+  --name=music-class-chat --restart=always \
+  -v music-class-chat-uploads:/app/uploads \
+  -v music-class-chat-sessions:/app/sessions \
+  -e BASEPATH=/3/music-class-chat \
+  -e MONGODB=mongodb://music-class-chat-server:`cat mongo.password`@mongodb/admin \
+  music-class-chat
 
