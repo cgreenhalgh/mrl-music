@@ -343,3 +343,22 @@ sudo docker run --network=internal -d \
   -e MONGODB=mongodb://music-class-chat-server:`cat mongo.password`@mongodb/admin \
   music-class-chat
 
+cd ..
+
+# braincontrolledmovie.co.uk - wordpress (temp?)
+cd braincontrolledmovie
+# edit createdb.sql
+cat createdb.sql | sudo docker run -i --rm --network=internal mysql:5.7 sh -c "exec mysql -hhubdb -P3306 -uroot -p`cat ../music-hub/hubdb.password`"
+# can check: sudo docker run -it --rm --network=internal mysql:5.7 sh -c "mysql -hhubdb -uwp-bcm -P3306 -pXXXX wp-bcm"
+# get bcm.sql
+cat bcm.sql | sudo docker run -i --rm --network=internal mysql:5.7 sh -c "mysql -hhubdb -uwp-bcm -P3306 -pXXXX wp-bcm"
+
+#sudo docker volume create braincontrolledmovie
+
+# initial build/run?
+#  -v braincontrolledmovie:/var/www/html \
+# not working, i.e. image not compatible with docker 17.3 on current machine
+# (and docker failed when i tried upgrading it)
+sudo docker run --network=internal -d \
+  --name=bcm --restart=always \
+  wordpress:5.8.2-php7.4-apache
