@@ -244,6 +244,10 @@ sudo docker run --name frontend -d --restart=always --network=internal \
   -v `pwd`/certbot/www:/var/www/certbot \
   -v `pwd`/../logs/nginx:/var/log/nginx/log frontend 
 
+# Actually soundpostcards.sonicfutures.org has gone so forget this for now...
+#
+## BEGIN IGNORE (soundpostcards)
+#
 # remove old certs
 rm -Rf certbot/conf/live/soundpostcards.sonicfutures.org && \
   rm -Rf certbot/conf/archive/soundpostcards.sonicfutures.org && \
@@ -275,6 +279,9 @@ sudo crontab -e
 0   3  *   *   *     docker kill -s HUP frontend > /dev/null
 # check cron
 sudo systemctl | grep cron
+#
+## END IGNORE (soundpostcards)
+#
 
 # firewall
 #sudo iptables -L DOCKER --line-numbers
